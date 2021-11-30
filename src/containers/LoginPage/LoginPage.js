@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from "react";
 import { useHistory } from "react-router";
 import "./LoginPage.css";
@@ -22,18 +23,22 @@ export const LoginPage = ({
 
   const handleLogIn = (e) => {
     e.preventDefault();
-
-    if (login === 'admin' && password === '123456') {
-      localStorage.setItem('isLoggedIn', true);
-      localStorage.setItem('userName', login);
-      setUserName(login);
-      setIsLoggedIn(true);
-      history.push('/');
-    }
-    else {
-      alert('Введите правильный логин или пароль!');
-      return false
-    }
+    axios.get('https://61993e899022ea0017a7aded.mockapi.io/Avtorizatsia')
+      .then(res => {
+        const found = res.data.find((item) => item.Login === login && item.Password === password);
+        if (found) {
+          localStorage.setItem('isLoggedIn', true);
+          localStorage.setItem('userName', found.Login);
+          setUserName(found.Login);
+          setIsLoggedIn(true);
+          history.push('/');
+        } else {
+          alert('Введите правильный логин или пароль!');
+        }
+      })
+      .catch(err => {
+        console.err(err)
+      })
   }
 
   return (
